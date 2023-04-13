@@ -14,6 +14,18 @@ def write(tb, values):
     con.close()
 
 
+def updatewhere(tb, cols, vals, usl):
+    con = sqlite3.connect(db_name)
+    cur = con.cursor()
+    req = ""
+    for i in range(len(cols)):
+        req = req + cols[i] + '=' + vals[i] +','
+    req = req.rstrip(',')
+    cur.execute(f"""UPDATE profiles SET {req} WHERE {usl}""")
+    con.commit()
+    con.close()
+
+
 def readwhere(tb, col, usl):
     con = sqlite3.connect(db_name)
     cur = con.cursor()
@@ -56,6 +68,17 @@ def main():
         response['reg'] = True
         response['text'] = "Успешная регистрация!"
         return jsonify(response)
+    elif event['mode'] == 'profile':
+        number = event['number']
+        name = event['name']
+        surname = event['surname']
+        patronymic = event['patronymic']
+        if number in readwhere('profiles', ['number'], "number='{number}'"):
+            updatewhere('profiles', ['name', 'surname', 'patronymic'], [name, surname, patronymic], "number='{number}'")
+            return jsonify(response)
+        write('profiles', [number, name, surname, patronymic, "picture"])
+        return jsonify(response)
+        
         
 
 
