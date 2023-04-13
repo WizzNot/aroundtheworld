@@ -31,31 +31,31 @@ def main():
     response = {}
     event = request.json
     if event['mode'] == 'login':
-        lg = event['number'].lstrip('+').replace('-', '')
+        lg = event['number'].lstrip('+').replace('-', '').replace(' ','')
         ps = event['password']
         users = readwhere("users", ["number", "password"], f"number='{lg}' AND password='{ps}'")
         if len(users) == 0:
             response['login'] = False
         else:
             response['login'] = True
-        return response
+        return jsonify(response)
     elif event['mode'] == 'reg':
-        lg = event['number'].lstrip('+').replace('-', '')
+        lg = event['number'].lstrip('+').replace('-', '').replace(' ', '')
         ps = event['password']
         scndps = event['second_password']
         if ps != scndps:
             response['reg'] = False
             response['text'] = "Перепроверьте пароль! Ваши пароли не совпадают."
-            return response
+            return jsonify(response)
         users = readwhere('users', ['number'], f"number={lg}")
         if len(users) != 0:
             response['reg'] = False
             response['text'] = "Ваш номер телефона уже зарегистрирован! Попробуйте войти."
-            return response
+            return jsonify(response)
         write('users', [lg, ps])
         response['reg'] = True
         response['text'] = "Успешная регистрация!"
-        return response
+        return jsonify(response)
         
 
 
